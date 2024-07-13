@@ -1,4 +1,3 @@
-from .game_logic import ranks, suits
 from flask_sqlalchemy import SQLAlchemy
 
 db = SQLAlchemy()
