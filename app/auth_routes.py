@@ -13,14 +13,18 @@ def signup():
     name = body.get("name")
     password = body.get("password")
     password = str(password)
+
     if not email or not name or not password:
         return jsonify({"msg": "Missing required fields"}), 400
 
     if Player.query.filter_by(email=email).first():
         return jsonify({"msg": "Email already exists"}), 400
-
-    hashed_password = bcrypt.generate_password_hash(password).decode('utf-8')
+    
+    hashed_password = bcrypt.generate_password_hash(password).decode('utf8')
     new_player = Player(name=name, email=email, password=hashed_password)
+
+    
+    
 
     db.session.add(new_player)
     db.session.commit()
@@ -37,6 +41,7 @@ def login():
     password = data.get("password")
 
     password = str(password)
+    
 
     if not email or not password:
         return jsonify({"msg": "Missing required fields"}), 400

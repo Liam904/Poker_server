@@ -1,5 +1,6 @@
 import random
 from app.models import Card, Game, db, Player
+from flask_jwt_extended import get_current_user
 
 
 class GameEngine:
@@ -45,6 +46,8 @@ class GameEngine:
 
     def player_moves(self, rank, suit):
         play = (rank, suit)
+        if not self.deck:
+            return {"message":"deck is empty"}
         if play in self.player_hand and (
             play[0] == self.tablecard[-1][0] or play[1] == self.tablecard[-1][1]
         ):
@@ -79,6 +82,8 @@ class GameEngine:
             or card[0] == "joker"
             or card[1] == "joker"
         ]
+        if not self.deck:
+            return {"message":"deck is empty"}
 
         if playable_cards:
             play = random.choice(playable_cards)
@@ -99,6 +104,8 @@ class GameEngine:
                 for _ in range(5):
                     if self.deck:
                         self.player_hand.append(self.deck.pop())
+        
+    
         else :
             self.computer_hand.append(self.deck.pop())
             return {"message": "Computer picked a move"}
@@ -114,8 +121,8 @@ class GameEngine:
         self.deal_cards()
         new_game = Game(
             deck=self.deck,
-            computer_id=computer_id,
-            player_id=player_id,
+            computer_id=player_id,
+            player_id=computer_id,
             table_card=self.tablecard,
         )
 
