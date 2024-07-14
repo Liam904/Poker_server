@@ -1,5 +1,6 @@
-from flask import Blueprint, jsonify, request
-from flask_jwt_extended import create_access_token, create_refresh_token
+from flask import Blueprint, jsonify, request, session
+from flask_jwt_extended import create_access_token, jwt_required, create_refresh_token, get_jwt
+
 from app import bcrypt
 from .models import Player, db
 
@@ -57,3 +58,4 @@ def login():
         }), 200
 
     return jsonify({"msg": "Invalid email or password"}), 401
+

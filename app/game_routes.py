@@ -1,5 +1,6 @@
 from flask import jsonify, Blueprint, request
 from .game import GameEngine
+import random 
 from flask_jwt_extended import jwt_required, get_jwt_identity
 
 game = Blueprint("game", __name__)
@@ -39,6 +40,6 @@ def computer_moves():
 @jwt_required()
 def new_game():
     player = get_jwt_identity()
-    computer_id = 1
+    computer_id = random.randint(1, 10)
     print(player)
     return jsonify(game_engine.new_game(player, computer_id))

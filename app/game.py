@@ -1,6 +1,5 @@
 import random
 from app.models import Card, Game, db, Player
-from flask_jwt_extended import get_current_user
 
 
 class GameEngine:
@@ -9,12 +8,10 @@ class GameEngine:
         self.player_hand = []
         self.computer_hand = []
         self.tablecard = []
-        self.reset_cards
-        self.reset_deck
 
     def create_deck(self):
         cards = Card.query.all()
-        ##resets deck when not empty
+      
         if self.deck is not None:
             self.reset_deck()
 
@@ -97,8 +94,7 @@ class GameEngine:
                         self.player_hand.append(self.deck.pop())
 
             if play[0] in ["K", "Q", "J", "8"]:
-                self.computer_moves()
-                self.player_moves()
+               pass
 
             if play[0] == "joker" or play[1] == "joker":
                 for _ in range(5):
