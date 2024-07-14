@@ -8,10 +8,14 @@ class GameEngine:
         self.player_hand = []
         self.computer_hand = []
         self.tablecard = []
+        self.create_deck
+        self.reset_deck
+
 
     def create_deck(self):
+
         cards = Card.query.all()
-      
+        ##Clears the deck before adding another
         if self.deck is not None:
             self.reset_deck()
 
@@ -24,12 +28,13 @@ class GameEngine:
         return self.deck
 
     def deal_cards(self):
-        if not self.deck:
-            return {"Message": "No deck found"}
-        
+        ##resers players' hand to limit number of cards
         if self.player_hand  or self.computer_hand is not None:
             self.reset_cards()
-            
+
+        ##Creates a new deck when it is empty
+        if len(self.deck) < 10:
+            self.create_deck()
         for _ in range(4):
             self.player_hand.append(self.deck.pop())
             self.computer_hand.append(self.deck.pop())
@@ -112,8 +117,11 @@ class GameEngine:
         }
 
     def new_game(self, player_id, computer_id):
-    
+        print("request starts here")
+
         self.create_deck()
+        print(self.deck)
+        print("ends here")
         self.deal_cards()
         new_game = Game(
             deck=self.deck,
@@ -129,7 +137,6 @@ class GameEngine:
 
         return {
             "game": {
-                # "deck": new_game.deck,
                 "table_card": new_game.table_card,
                 "player": new_game.player_id,
                 "related_player": {
@@ -150,6 +157,6 @@ class GameEngine:
             "computer":self.computer_hand,
             "deck": self.tablecard
         }
+    
     def reset_deck(self):
-        self.deck = []
-     
+        self.deck =[]

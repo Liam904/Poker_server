@@ -9,16 +9,12 @@ game = Blueprint("game", __name__)
 game_engine = GameEngine()
 
 
-@game.route("/game/deck", methods=["GET"])
-@jwt_required()
-def create_deck():
-    return jsonify(game_engine.create_deck())
-
-
+## code renders in the dashboard to display the players' cards
 @game.route("/game/deal_cards", methods=["GET"])
 @jwt_required()
 def deal_cards():
-    return jsonify(game_engine.deal_cards())
+   return jsonify(game_engine.deal_cards())
+
 
 
 @game.route("/game/playermoves", methods=["POST"])
@@ -40,6 +36,9 @@ def computer_moves():
 @jwt_required()
 def new_game():
     player = get_jwt_identity()
+    if not player:
+        return jsonify({"Message": "login required"})
     computer_id = random.randint(1, 10)
+    ##for debugging purposes
     print(player)
     return jsonify(game_engine.new_game(player, computer_id))
