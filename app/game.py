@@ -1,162 +1,91 @@
 import random
 from app.models import Card, Game, db, Player
-
+from flask import jsonify
 
 class GameEngine:
     def __init__(self):
         self.deck = []
         self.player_hand = []
         self.computer_hand = []
-        self.tablecard = []
-        self.create_deck
-        self.reset_deck
-
+        self.table_card = []
 
     def create_deck(self):
-
         cards = Card.query.all()
-        ##Clears the deck before adding another
-        if self.deck is not None:
-            self.reset_deck()
-
-        for card in cards:
-            card_list = (card.rank, card.suit)
-            self.deck.append(card_list)
-            random.shuffle(self.deck)
-
-        
+        self.reset_deck()
+        self.deck = [(card.rank, card.suit) for card in cards]
+        random.shuffle(self.deck)
         return self.deck
 
     def deal_cards(self):
-        ##resers players' hand to limit number of cards
-        if self.player_hand  or self.computer_hand is not None:
-            self.reset_cards()
-
-        ##Creates a new deck when it is empty
-        if len(self.deck) < 10:
-            self.create_deck()
+        self.create_deck()
+        self.reset_cards()
+        
         for _ in range(4):
             self.player_hand.append(self.deck.pop())
             self.computer_hand.append(self.deck.pop())
-
-        self.tablecard.append(self.deck.pop())
+        
+        self.table_card.append(self.deck.pop())
         return {
             "player_hand": self.player_hand,
             "computer_hand": self.computer_hand,
-            "table_card": self.tablecard,
+            "table_card": self.table_card,
         }
 
     def player_moves(self, rank, suit):
         play = (rank, suit)
-        if not self.deck:
-            return {"message":"deck is empty"}
         if play in self.player_hand and (
-            play[0] == self.tablecard[-1][0] or play[1] == self.tablecard[-1][1]
+            play[0] == self.table_card[-1][0] or play[1] == self.table_card[-1][1]
         ):
-            self.tablecard.append(play)
+            self.table_card.append(play)
             self.player_hand.remove(play)
+            penalty = []
             if play[0] in ["2", "3"]:
-                penalty_cards = 2 if play[0] == "2" else 3
-                for _ in range(penalty_cards):
-                    if self.deck:
-                        self.computer_hand.append(self.deck.pop())
+                for _ in range(2):
+                    card = self.deck.pop()
+                    self.computer_hand.append(card)
+                    penalty.append(card)
 
-            if play[0] in ["K", "Q", "J", "8"]:
-                self.player_moves()
-                self.computer_moves()
-        if play[0]=="pick":
-            self.player_hand.append(self.deck.pop())
-
+            
+            return {
+                "computer_hand":self.computer_hand,
+                "valid":True,
+                "penalty":penalty
+            }
         else:
-            return {"message": "Invalid move"}
-        return {
-            "player_hand": self.player_hand,
-            "computer_hand": self.computer_hand,
-            "table_card": self.tablecard,
-        }
+            return {
+                "valid":False
+            }
 
-    def computer_moves(self):
-        playable_cards = [
-            card
-            for card in self.computer_hand
-            if card[0] == self.tablecard[-1][0]
-            or card[1] == self.tablecard[-1][1]
-            or card[0] == "joker"
-            or card[1] == "joker"
-        ]
-        if not self.deck:
-            return {"message":"deck is empty"}
-
-        if playable_cards:
-            play = random.choice(playable_cards)
-            self.tablecard.append(play)
-            self.computer_hand.remove(play)
-
-            if play[0] in ["2", "3"]:
-                penalty_cards = 2 if play[0] == "2" else 3
-                for _ in range(penalty_cards):
-                    if self.deck:
-                        self.player_hand.append(self.deck.pop())
-
-            if play[0] in ["K", "Q", "J", "8"]:
-               pass
-
-            if play[0] == "joker" or play[1] == "joker":
-                for _ in range(5):
-                    if self.deck:
-                        self.player_hand.append(self.deck.pop())
-        
-    
-        else :
-            self.computer_hand.append(self.deck.pop())
-            return {"message": "Computer picked a move"}
-        return {
-            "computer_hand": self.computer_hand,
-            "player_hand": self.player_hand,
-            "table_card": self.tablecard,
-        }
 
     def new_game(self, player_id, computer_id):
-        print("request starts here")
-
-        self.create_deck()
-        print(self.deck)
-        print("ends here")
-        self.deal_cards()
         new_game = Game(
             deck=self.deck,
-            computer_id=player_id,
-            player_id=computer_id,
-            table_card=self.tablecard,
+            computer_id=computer_id,
+            player_id=player_id,
+            table_card=self.table_card,
         )
-
         db.session.add(new_game)
         db.session.commit()
-
         related_player = Player.query.get(player_id)
+        return {
+            "table_card": new_game.table_card,
+            "player": {
+                "id": related_player.id,
+                "name": related_player.name,
+                "cards": self.player_hand,
+            },
+            "computer": self.computer_hand,
+        }
 
-        return {
-            "game": {
-                "table_card": new_game.table_card,
-                "player": new_game.player_id,
-                "related_player": {
-                    "id": related_player.id,
-                    "name": related_player.name,
-                    "cards": self.player_hand,
-                },
-                "computer": {"cards": self.computer_hand},
-            }
-        }
-    
     def reset_cards(self):
-        self.player_hand=[]
+        self.player_hand = []
         self.computer_hand = []
-        self.tablecard = []
+        self.table_card = []
         return {
-            "player":self.player_hand,
-            "computer":self.computer_hand,
-            "deck": self.tablecard
+            "player": self.player_hand,
+            "computer": self.computer_hand,
+            "table_card": self.table_card,
         }
-    
+
     def reset_deck(self):
-        self.deck =[]
+        self.deck = []

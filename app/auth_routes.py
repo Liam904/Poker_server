@@ -15,8 +15,21 @@ def signup():
     password = body.get("password")
     password = str(password)
 
+
+
     if not email or not name or not password:
         return jsonify({"msg": "Missing required fields"}), 400
+    
+    if len(name) < 4 :
+        return jsonify({"msg": "Name too short"}), 400
+    
+    if len(password) < 5:
+        return jsonify({"message": "Password too short"})
+    
+    if len(email) < 5:
+        return jsonify({"message": "email too short"})
+
+
 
     if Player.query.filter_by(email=email).first():
         return jsonify({"msg": "Email already exists"}), 400
