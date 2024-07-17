@@ -17,9 +17,7 @@ class GameEngine:
         return self.deck
 
     def deal_cards(self):
-        self.create_deck()
         self.reset_cards()
-        
         for _ in range(4):
             self.player_hand.append(self.deck.pop())
             self.computer_hand.append(self.deck.pop())
@@ -43,7 +41,6 @@ class GameEngine:
                     card = self.deck.pop()
                     self.computer_hand.append(card)
                     
-
             
             return {
                 "player_hand":self.player_hand,
@@ -69,7 +66,7 @@ class GameEngine:
             self.computer_hand.remove(play)
 
             if play[0] in ['2',"3"]:
-                self.computer_hand.append(self.deck.pop())
+                self.player_hand.append(self.deck.pop())
         
         else:
             self.computer_hand.append(self.deck.pop())
@@ -88,6 +85,7 @@ class GameEngine:
             player_id=player_id,
             table_card=self.table_card,
         )
+        self.create_deck()
         db.session.add(new_game)
         db.session.commit()
         related_player = Player.query.get(player_id)

@@ -25,11 +25,6 @@ def player_moves():
     suit = body.get("suit")
     return game_engine.player_moves(rank, suit)
 
-
-@game.route("/game/computer_moves", methods=['GET'])
-def computer_moves():
-        return game_engine.computer_moves()
-
 @game.route("/game/new_game", methods=["POST"])
 @jwt_required()
 def new_game():
