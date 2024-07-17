@@ -11,6 +11,3 @@ flask-jwt-extended = "*"
 flask-bcrypt = "*"
 
 [dev-packages]
-
-[requires]
-python_version = "3.12"
