@@ -1,6 +1,8 @@
 import random
 from app.models import Card, Game, db, Player
 from flask import jsonify
+import sys
+
 
 class GameEngine:
     def __init__(self):
@@ -21,7 +23,7 @@ class GameEngine:
         for _ in range(4):
             self.player_hand.append(self.deck.pop())
             self.computer_hand.append(self.deck.pop())
-        
+
         self.table_card.append(self.deck.pop())
         return {
             "player_hand": self.player_hand,
@@ -40,21 +42,22 @@ class GameEngine:
                 for _ in range(2):
                     card = self.deck.pop()
                     self.computer_hand.append(card)
-                    
-            
+
             return {
-                "player_hand":self.player_hand,
-                "valid":True,
-                "player":"player",
-                "computer_moves":self.computer_moves()
-        
+                "player_hand": self.player_hand,
+                "valid": True,
+                "player": "player",
+                "computer_moves": self.computer_moves(),
             }
         else:
+            self.computer_hand.append(self.deck.pop())
             return {
-                "valid":False
-                }
+                "valid": False,
+            }
+
     def computer_moves(self):
         playable_cards = []
+        new_player_hand = []
 
         for card in self.computer_hand:
             if card[0] == self.table_card[-1][0] or card[1] == self.table_card[-1][1]:
@@ -65,18 +68,17 @@ class GameEngine:
             self.table_card.append(play)
             self.computer_hand.remove(play)
 
-            if play[0] in ['2',"3"]:
-                self.player_hand.append(self.deck.pop())
-        
-        else:
-            self.computer_hand.append(self.deck.pop())
+            if play[0] in ["2", "3"]:
 
-        
-        return {"computer_hand": self.computer_hand, "table_card": self.table_card}
-     
-                  
+                for _ in range(2):
+                    cards = self.deck.pop()
+                    new_player_hand.append(cards)
 
-        
+        return {
+            "computer_hand": self.computer_hand,
+            "table_card": self.table_card,
+            "new_player_hand": new_player_hand,
+        }
 
     def new_game(self, player_id, computer_id):
         new_game = Game(
