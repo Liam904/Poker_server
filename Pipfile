@@ -9,5 +9,9 @@ flask-migrate = "*"
 flask-cors = "*"
 flask-jwt-extended = "*"
 flask-bcrypt = "*"
+flask-sqlalchemy = "*"
+psycopg2-binary = "*"
+bcrypt = "*"
+python-dotenv = "*"
 
 [dev-packages]

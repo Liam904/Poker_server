@@ -18,7 +18,7 @@ def deal_cards():
 
 
 @game.route("/game/playermoves", methods=["POST"])
-@jwt_required()
+#@jwt_required()
 def player_moves():
     body = request.get_json()
     rank = body.get("rank")

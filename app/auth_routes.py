@@ -71,4 +71,3 @@ def login():
         }), 200
 
     return jsonify({"msg": "Invalid email or password"}), 401
-
